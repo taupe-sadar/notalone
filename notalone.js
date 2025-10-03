@@ -1554,6 +1554,8 @@ define([
                     var place = placeElement.id.split('_')[2];
                     if (this.gamedatas.gamestate.token) {
                         this.onMoveHuntToken(place);
+                        dojo.removeClass('creature_token', 'selectable');
+                        dojo.removeClass('target_token', 'selectable');
                     }
                     break;
                 case 'cataclysm':
