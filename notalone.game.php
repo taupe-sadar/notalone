@@ -2411,6 +2411,7 @@ class NotAlone extends Table
         }
 
         $huntCardsPlayed = $this->huntDeck->getCardsInLocation('played');
+        usort($huntCardsPlayed, function($a,$b){return $a['location_arg'] <=> $b['location_arg'];});
         foreach ($huntCardsPlayed as $huntCard) {
           $this->huntDeck->insertCardOnExtremePosition($huntCard['id'], 'discard', true);
         }
