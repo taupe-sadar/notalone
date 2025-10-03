@@ -1,0 +1,970 @@
+/**
+ *------
+ * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+ * NotAlone implementation : © Romain Fromi <romain.fromi@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ *
+ * notalone.css
+ *
+ * NotAlone stylesheet
+ *
+ */
+/*
+    This is the CSS stylesheet of your game User Interface.
+    
+    Styles defined on this file will be applied to the HTML elements you define in your
+    HTML template (notalone_notalone.tpl), and to HTML elements you create dynamically
+    (in notalone.js).
+    
+    Usually, you are using CSS to:
+    
+    1°) define the overall layout of your game
+        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
+
+    2°) create your CSS-sprites:
+        All images of your games should be gathered into a small number of image files. Then, using
+        background-image and background-position CSS properties, you create HTML blocks that can
+        display these images correctly (see example below).
+    
+    3°) ... anything else:
+        It is really easy to add and remove CSS classes dynamically from your Javascript with
+        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
+        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
+        very often, using CSS classes for the logic of your user interface allow you to do complex
+        thing easily.
+        
+        
+     Note: on the production platform, this file will be compressed and comments will be removed.
+           Consequently, don't hesitate to put as many comments as necessary.
+*/
+@import url(../../../css/csslayer.css); /* Note: you must not use any @import directive other than this one */
+
+/********* You can start writing your CSS below this line: **********/
+
+html {
+    background: url(img/universe.jpg);
+}
+
+.player-board {
+    background-color: transparent;
+}
+
+.player_board_inner {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    color: #dbe3ea;
+    border-width: 2px;
+    border-style: solid;
+    border-color: gray;
+    border-radius: 5px;
+    box-shadow: 3px 5px 20px 4px #3b3b3b;
+}
+
+.cardsZone {
+    text-align: center;
+    overflow: hidden;
+    width: 100% !important;
+    margin-top: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cardsZone h2, .player-name, .huntedName {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px grey, 0 0 30px grey, 0 0 40px grey, 0 0 55px black, 0 0 75px black;
+}
+
+.cardsZone .stockitem {
+    border: black 3px solid;
+    border-radius: 10px;
+}
+
+#hand_zone, #choice_zone {
+    padding-top: 5px;
+}
+
+#hand, #choice, #huntDiscard, #survivalDiscard, #ongoingEffects {
+    margin: auto;
+}
+
+#hand .stockitem, #choice .stockitem {
+    -moz-box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
+    -webkit-box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
+    -o-box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
+    box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=134, Strength=15);
+}
+
+#hand .stockitem {
+    z-index: 100;
+}
+
+#hand .stockitem_selected {
+    border: blue 3px solid !important;
+}
+
+.stockitem:not(.stockitem_unselectable) {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+#choice_zone, #ongoing_effects_zone, #artemia_zone {
+    transition-property: height, margin, padding;
+    transition-duration: 0.5s;
+    transition-delay: 0.2s;
+}
+
+#choice_zone {
+    height: 237px;
+}
+
+#ongoing_effects_zone {
+    height: 247px;
+}
+
+#artemia_zone {
+    height: 419px;
+}
+
+#choice_zone.hidden, #ongoing_effects_zone.hidden, #artemia_zone.hidden {
+    height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+#choice_zone h2 {
+    margin-top: 0;
+}
+
+.placeCard {
+    font-size: 12px;
+}
+
+.placeCard h3 {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 69%;
+    text-align: center;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.dijitTooltip .placeCard h3  {
+    top: 70%;
+}
+
+.placeCard .description {
+    position: absolute;
+    top: 77%;
+    bottom: 6px;
+    text-align: center;
+    right: 0;
+    left: 0;
+    overflow: hidden;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 0.7em;
+}
+
+.placeCard .description p {
+    margin: 0;
+}
+
+#hand_item_1 .description, #artemia_item_1 .description, .placeCard[data-value="1"] .description {
+    font-size: 0.55em;
+}
+
+#logs .cardName {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+#dialogContent {
+    text-align: center;
+}
+
+#dialogContent .cardsWrapper {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#dialogContent .survivalCard, #dialogContent .huntCard, #dialogContent .placeCard,
+.dijitTooltip .huntCard, .dijitTooltip .survivalCard, .dijitTooltip .placeCard {
+    border: black 3px solid;
+    border-radius: 10px;
+}
+
+#dialogContent .survivalCard, #dialogContent .huntCard, .dijitTooltip .huntCard, .dijitTooltip .survivalCard {
+    position: relative;
+    width: 136px;
+    height: 196px;
+    background-image: url("img/hunt_survival_cards.jpg");
+}
+
+.dijitTooltip .placeCard {
+    position: relative;
+    width: 136px;
+    height: 196px;
+    background-image: url("img/place_cards.jpg");
+}
+
+#dialogContent .survivalCard, .dijitTooltip .survivalCard {
+    background-position: right;
+}
+
+@media only screen and (min-width: 740px) {
+    #dialogContent .survivalCard, #dialogContent .huntCard, .dijitTooltip .huntCard, .dijitTooltip .survivalCard, .dijitTooltip .placeCard {
+        width: 272px;
+        height: 392px;
+        background-size: cover;
+        font-size: 24px;
+    }
+
+    .dijitTooltip .placeCard {
+        background-size: 1360px;
+    }
+
+    .dijitTooltip .placeCard h3 {
+        top: 71%;
+    }
+}
+
+
+#dialogContent .survivalCard {
+    background-position: -100% 0;
+}
+
+.survivalCard, .huntCard {
+    font-size: 12px;
+}
+
+.survivalCard h3 {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 4%;
+    text-align: center;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.survivalCard p.description {
+    position: absolute;
+    right: 2%;
+    left: 2%;
+    top: 27%;
+    bottom: 20%;
+    text-align: center;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+}
+
+.survivalCard p.description span {
+    width: 100%;
+}
+
+.survivalCard p.phase {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 2.5%;
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.huntCard h3 {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 1%;
+    text-align: center;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.huntCard p.description {
+    position: absolute;
+    right: 1.5%;
+    left: 1.5%;
+    top: 49%;
+    bottom: 5%;
+    text-align: center;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.huntCard p.description span {
+    width: 100%;
+}
+
+.huntCard p.phase {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.huntCard .huntToken {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    top: 26px;
+    width: 30px;
+    height: 30px;
+}
+
+#dialogContent .huntCard .huntToken, .dijitTooltip .huntCard .huntToken {
+    top: 52px;
+    width: 60px;
+    height: 60px;
+}
+
+#artemia_zone {
+    position: relative;
+    text-align: center;
+    padding: 5px 0;
+}
+
+#artemia_zone h2 {
+    writing-mode: vertical-lr;
+    text-orientation: upright;
+    -ms-writing-mode: tb-rl;
+    text-transform: uppercase;
+    position: absolute;
+    left: -30px;
+    top: 0;
+    bottom: 0;
+}
+
+#artemia_wrap {
+    width: 715px;
+    margin: auto;
+    position: relative;
+}
+
+#artemia .stockitem {
+    text-align: right;
+}
+
+#artemia .stockitem.selectable {
+    cursor: pointer !important;
+    box-shadow: inset 0 0 20px green;
+}
+
+#artemia .stockitem.selectable:hover {
+    box-shadow: inset 0 0 20px lime;
+}
+
+.huntedName {
+    display: block;
+    padding: 2px;
+    font-weight: bold;
+    max-width: 132px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    float: right;
+    clear: right;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    font-size: 16px;
+    z-index: 10;
+}
+
+.showLater {
+    animation: 1s showLater;
+    animation-fill-mode: forwards;
+    visibility: hidden;
+}
+
+@keyframes showLater {
+    99% {
+        visibility: hidden;
+    }
+    100% {
+        visibility: visible;
+    }
+}
+
+.zoom-in {
+    -webkit-animation: zoom-in 1s;
+    animation: zoom-in 1s;
+}
+
+/* Zoom in Keyframes */
+@-webkit-keyframes zoom-in {
+    0% {transform: scale(1);}
+    50% {transform: scale(1.8);}
+    100% {transform: scale(1);}
+}
+@keyframes zoom-in {
+    0% {transform: scale(1);}
+    50% {transform: scale(1.8);}
+    100% {transform: scale(1);}
+} /*End of Zoom in Keyframes */
+
+
+#place_cards_reserve {
+    display: flex;
+    justify-content: space-around;
+    width: 715px;
+    margin: auto;
+}
+
+#place_cards_reserve > p {
+    width: 28px;
+    height: 15px;
+    font-size: 12px;
+    margin: -2px 0 0;
+    color: antiquewhite;
+    background-color: black;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+.huntToken {
+    background-image: url("img/hunt_tokens.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 150;
+    width: 80px;
+    height: 80px;
+}
+
+.huntToken.target {
+    background-position: 50% 0;
+}
+
+.huntToken.artemia {
+    background-position: 100% 0;
+}
+
+.huntToken.placeholder {
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.huntToken.placeholder:hover {
+    opacity: 0.8;
+}
+
+.huntTokensWrapper {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#artemia_zone .huntToken {
+    margin: -22px;
+    z-index: 50;
+    box-shadow: 0 2px;
+    border-radius: 40px;
+    background-color: black;
+}
+
+.huntToken .temp {
+    box-shadow: 3px 5px;
+    border-radius: 40px;
+    background-color: black;
+}
+
+#artemia .placeCard .huntTokensWrapper {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 46px;
+    flex-direction: column;
+}
+
+.huntTokensWrapper.adjacentPlaces {
+    top: 0;
+    bottom: 0;
+}
+
+.huntTokensWrapper.adjacentPlaces.firstRow, .huntTokensWrapper.adjacentPlaces.secondRow {
+    flex-direction: column;
+}
+
+.huntTokensWrapper.adjacentPlaces.firstRow {
+    bottom: 204px;
+}
+
+.huntTokensWrapper.adjacentPlaces.secondRow {
+    top: 204px;
+}
+
+#artemia_zone .huntToken.selectable {
+    box-shadow: inset 0 0 20px green;
+    border: 3px solid green;
+}
+
+#artemia_zone .huntToken.selectable:hover {
+    box-shadow: inset 0 0 20px lime;
+    border: 3px solid lime;
+    cursor: pointer;
+}
+
+#artemia_tokens_11, #artemia_tokens_20 {
+    left: 0;
+    right: 430px;
+}
+
+#artemia_tokens_12, #artemia_tokens_21 {
+    left: 143px;
+    right: 287px;
+}
+
+#artemia_tokens_13, #artemia_tokens_22 {
+    left: 286px;
+    right: 144px;
+}
+
+#artemia_tokens_14, #artemia_tokens_23 {
+    left: 429px;
+    right: 0;
+}
+
+#artemia_tokens_15 {
+    left: 0;
+    right: 573px;
+}
+
+#artemia_tokens_16 {
+    left: 143px;
+    right: 430px;
+}
+
+#artemia_tokens_17 {
+    left: 286px;
+    right: 287px;
+}
+
+#artemia_tokens_18 {
+    left: 429px;
+    right: 144px;
+}
+
+#artemia_tokens_19 {
+    left: 572px;
+    right: 0;
+}
+
+.playerDiscardStock {
+    margin: 0 5px;
+}
+
+.playerDiscardStock .stockitem {
+    border: black 1px solid;
+}
+
+.playerDiscardStock .stockitem.played {
+    box-shadow: 1px 1px 1px blue;
+}
+
+.player-board.selectable .player_board_inner {
+    border-color: green;
+    box-shadow: inset 0 0 20px green;
+    cursor: pointer;
+}
+
+.player-board.selectable .player_board_inner:hover {
+    border-color: lime;
+    box-shadow: inset 0 0 20px lime;
+}
+
+.playerElements {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    height: 32px;
+}
+
+.cardsCount, .deckCount {
+    position: relative;
+    color: antiquewhite;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    font-weight: bold;
+    font-size: 20px;
+    z-index: 1;
+    width: 24px;
+    text-align: right;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.cardsCount:before {
+    content: '';
+    background-image: url("img/cards_back.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 26px;
+    width: 18px;
+    border: 1px solid black;
+    border-radius: 4px;
+    z-index: -1;
+}
+
+.placeCardsCount:before {
+    background-position: left;
+}
+
+.survivalCardsCount:before {
+    background-position: center;
+}
+
+.huntCardsCount:before {
+    background-position: right;
+}
+
+.deckCount {
+    position: absolute;
+    right: 0;
+}
+
+.huntDeckCount {
+    right: 40px;
+}
+
+.deckCount:before {
+    content: '';
+    background-image: url("img/deck_icons.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 30px;
+    width: 22px;
+    z-index: -1;
+}
+
+.huntDeckCount:before {
+    background-position: right;
+}
+
+.playerElements .willCounters {
+    flex-grow: 1;
+    margin: 5px;
+    margin-bottom: 0;
+}
+
+.willCounters .stockitem {
+    background-position-x: right;
+}
+
+#board {
+    position: relative;
+    margin-top: 10px;
+}
+
+#board_temp {
+    position: fixed;
+    z-index: 500;
+    transition-property: top;
+    transition-duration: 1s;
+}
+
+.board img {
+    position: relative;
+    width: 100%;
+}
+
+.rescueCounterName {
+    font-weight: bold;
+    color: #1AA0AD;
+}
+
+.assimilationCounterName {
+    font-weight: bold;
+    color: #6E2266;
+}
+
+.will-icon {
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+    top: 2px;
+    background-image: url(img/counters.png);
+    background-size: 105px;
+    background-position-x: right;
+}
+
+.counter {
+    position: absolute;
+    background-image: url('img/counters.png');
+    background-size: cover;
+    transition-property: top, left, right, bottom, margin-top;
+    transition-duration: 0.5s;
+}
+
+#marker_counter {
+    width: 54px;
+    height: 59px;
+    background-position: -100px;
+}
+
+#marker_counter[data-value="0"] {
+    top: 10px;
+    right: -70px;
+}
+
+#marker_counter[data-value="1"] {
+    top: 80px;
+    right: 225px;
+}
+
+.rescueCounter, .assimilationCounter {
+    width: 3.6%;
+    padding-top: 4.3%;
+    transition-delay: 0.5s;
+}
+
+.rescueCounter:hover, .assimilationCounter:hover {
+    margin-top: -4%;
+}
+
+.assimilationCounter {
+    background-position-x: 37%;
+}
+
+.rescueCounter[data-value="0"], .assimilationCounter[data-value="0"] {
+    top: 30.5%;
+    left: 57.9%;
+}
+
+.rescueCounter[data-value="1"] {
+    top: 46.5%;
+    left: 53.25%;
+}
+
+.rescueCounter[data-value="2"] {
+    top: 26.5%;
+    left: 49.55%;
+}
+
+.rescueCounter[data-value="3"] {
+    top: 52%;
+    left: 47.35%;
+}
+
+.rescueCounter[data-value="4"] {
+    top: 31.5%;
+    left: 43.65%;
+}
+
+.rescueCounter[data-value="5"] {
+    top: 57%;
+    left: 41.4%;
+}
+
+.rescueCounter[data-value="6"] {
+    top: 35%;
+    left: 37.8%;
+}
+
+.rescueCounter[data-value="7"] {
+    top: 60%;
+    left: 35.2%;
+}
+
+.rescueCounter[data-value="8"] {
+    top: 37.5%;
+    left: 31.9%;
+}
+
+.rescueCounter[data-value="9"] {
+    top: 61%;
+    left: 28.95%;
+}
+
+.rescueCounter[data-value="10"] {
+    top: 37%;
+    left: 26%;
+}
+
+.rescueCounter[data-value="11"] {
+    top: 59.5%;
+    left: 22.65%;
+}
+
+.rescueCounter[data-value="12"] {
+    top: 34.5%;
+    left: 20.1%;
+}
+
+.rescueCounter[data-value="13"] {
+    top: 55.5%;
+    left: 16.5%;
+}
+
+.rescueCounter[data-value="14"] {
+    top: 29.5%;
+    left: 14.35%;
+}
+
+.rescueCounter[data-value="15"] {
+    top: 49%;
+    left: 10.45%;
+}
+
+.rescueCounter[data-value="16"] {
+    top: 22%;
+    left: 8.8%;
+}
+
+.rescueCounter[data-value="17"] {
+    top: 40.5%;
+    left: 4.65%;
+}
+
+.rescueCounter[data-value="18"] {
+    top: 13.5%;
+    left: 3.4%;
+}
+
+.assimilationCounter[data-value="1"] {
+    top: 15.2%;
+    left: 62.55%;
+}
+
+.assimilationCounter[data-value="2"] {
+    top: 35.5%;
+    left: 66%;
+}
+
+.assimilationCounter[data-value="3"] {
+    top: 12%;
+    left: 68.55%;
+}
+
+.assimilationCounter[data-value="4"] {
+    top: 34.5%;
+    left: 71.5%;
+}
+
+.assimilationCounter[data-value="5"] {
+    top: 12.7%;
+    left: 74.55%;
+}
+
+.assimilationCounter[data-value="6"] {
+    top: 36.2%;
+    left: 77%;
+}
+
+.assimilationCounter[data-value="7"] {
+    top: 16.5%;
+    left: 80.5%;
+}
+
+.assimilationCounter[data-value="8"] {
+    top: 41.5%;
+    left: 82.5%;
+}
+
+.assimilationCounter[data-value="9"] {
+    top: 23.2%;
+    left: 86.35%;
+}
+
+.assimilationCounter[data-value="10"] {
+    top: 49.2%;
+    left: 87.8%;
+}
+
+.assimilationCounter[data-value="11"] {
+    top: 33%;
+    left: 91.9%;
+}
+
+.assimilationCounter[data-value="12"] {
+    top: 59.5%;
+    left: 92.85%;
+}
+
+.placeNumber {
+    display: inline-block;
+    width: 40px;
+    height: 45px;
+    background-image: url("img/place_cards_numbers.jpg");
+    margin: 2px;
+    border: 1px solid black;
+}
+
+#dialogContent .placeNumber {
+    background-image: url("img/place_cards.jpg");
+}
+
+.place-icon {
+    display: inline-block;
+    position: relative;
+    top: 2px;
+    width: 20px;
+    height: 14px;
+    background: url("img/place_cards_numbers_small.jpg");
+    background-size: cover;
+}
+
+.place-icon.place2 {
+    background-position-x: -20px;
+}
+
+.place-icon.place3 {
+    background-position-x: -40px;
+}
+
+.place-icon.place4 {
+    background-position-x: -60px;
+}
+
+.place-icon.place5 {
+    background-position-x: -80px;
+}
+
+.place-icon.place6 {
+    background-position-x: -100px;
+}
+
+.place-icon.place7 {
+    background-position-x: -120px;
+}
+
+.place-icon.place8 {
+    background-position-x: -140px;
+}
+
+.place-icon.place9 {
+    background-position-x: -160px;
+}
+
+.place-icon.place10 {
+    background-position-x: -180px;
+}
