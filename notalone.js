@@ -78,9 +78,9 @@ define([
             this.artemia.addItemType(8, 8, g_gamethemeurl + 'img/place_cards.jpg', 7);
             this.artemia.addItemType(9, 9, g_gamethemeurl + 'img/place_cards.jpg', 8);
             this.artemia.addItemType(10, 10, g_gamethemeurl + 'img/place_cards.jpg', 9);
-            for (var placeNum = 1; placeNum <= 10; placeNum++) {
-                this.artemia.addToStockWithId(placeNum, placeNum);
-            }
+
+            if( gamedatas.gamestate != 'boardSetup')
+                this.buildArtemiaZone();
 
             var tmpobj = {id: "marker_counter", "data-value": gamedatas.markerCounter};
             tmpobj['class'] = "counter";
@@ -239,7 +239,6 @@ define([
             }
 
             dojo.connect(this.playerHand, 'onChangeSelection', this, 'onHandCardSelectionChange');
-            dojo.query('#artemia .stockitem').connect('onclick', this, 'onClickArtemiaPlace');
 
             this.huntDiscard = new ebg.stock();
             this.huntDiscard.setSelectionMode(0);
@@ -323,6 +322,10 @@ define([
                         dojo.addClass("artemia_zone", "hidden");
                         this.gamedatas.boardSide = 1;
                         this.displayBoard();
+                    }
+                    else
+                    {
+                        this.buildArtemiaZone();
                     }
                     break;
                 case 'exploration':
@@ -569,7 +572,10 @@ define([
         onLeavingState: function (stateName) {
             switch (stateName) {
                 case 'boardSetup':
-                    dojo.removeClass("artemia_zone", "hidden");
+                    if (this.isCurrentPlayerActive()) {
+                        dojo.removeClass("artemia_zone", "hidden");
+                        this.buildArtemiaZone();
+                    }
                     break;
                 case 'hunting':
                     dojo.query("#artemia_zone .huntToken.placeholder").forEach(dojo.destroy);
@@ -794,6 +800,13 @@ define([
               'ongoing_effects_zone', 'after');
             this.addTooltip('rescueCounter', _('Rescue counter'), '');
             this.addTooltip('assimilationCounter', _('Assimilation counter'), '');
+        },
+
+        buildArtemiaZone: function() {
+            for (var placeNum = 1; placeNum <= 10; placeNum++) {
+                this.artemia.addToStockWithId(placeNum, placeNum);
+            }
+            dojo.query('#artemia .stockitem').connect('onclick', this, 'onClickArtemiaPlace');
         },
 
         setupCard: function (cardDiv, cardTypeId, cardId) {
