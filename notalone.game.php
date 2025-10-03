@@ -601,7 +601,7 @@ class NotAlone extends Table
     {
         $playerId = self::getActivePlayerId();
         $playedPlace = self::getUniqueValueFromDB("SELECT place_number FROM hunted_place_card WHERE location = 'RESOLVING'");
-        $powerUsed = $this->gamestate->state()['name'] == 'theJungle' ? 2 : 6;
+        $powerUsed = $this->gamestate->state()['place'];
         self::DbQuery("UPDATE hunted_place_card SET location = 'HAND' WHERE location = 'RESOLVING'");
         if ($playedPlace == $powerUsed) {
             self::notifyAllPlayers("playedPlaceTakenBack", clienttranslate('${player_name} takes back ${place_icon} ${place_name} using its power.'),
@@ -2567,7 +2567,8 @@ class NotAlone extends Table
                 $this->actTakeBackDiscardedPlaceCards();
                 break;
             case 'theJungle':
-            case 'Jungle_Swamp_Persecution':
+            case 'Jungle_Persecution':
+            case 'Swamp_Persecution':
                 $this->actTakeBackPlayedCard();
                 break;
             case 'theSwamp':

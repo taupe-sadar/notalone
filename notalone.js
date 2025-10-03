@@ -755,7 +755,8 @@ define([
                             this.addActionButton('passButton', _('Pass'), 'onConfirmReckoningPass');
                         }
                         break;
-                    case 'Jungle_Swamp_Persecution':
+                    case 'Jungle_Persecution':
+                    case 'Swamp_Persecution':
                         this.addActionButton('takeBackPlayedPlaceOnly_' + args.resolvingPlace, dojo.string.substitute(_('Take back ${place} only'), {place: this.getPlaceName(args.resolvingPlace)}), 'onTakeBackPlayedPlaceOnly');
                         if (this.player.discardedPlaces.length) {
                             this.addActionButton('takeBackDiscardedPlace', _('Take back 1 place card'), 'onTakeBackDiscardedPlace');

@@ -447,7 +447,7 @@ $machinestates = array(
         "action" => "stPlaceReckoning",
         "args" => "argsResolvingPlace",
         "possibleactions" => array("actTheSwamp"),
-        "transitions" => array("continue" => 7, "persecution" => 115, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
+        "transitions" => array("continue" => 7, "persecution" => 120, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 6
     ),
@@ -546,7 +546,7 @@ $machinestates = array(
     ),
 
     115 => array(
-        "name" => "Jungle_Swamp_Persecution",
+        "name" => "Jungle_Persecution",
         "description" => clienttranslate('${actplayer} can take back ${resolvingPlaceName} OR 1 discarded Place card (because of Persecution).'),
         "descriptionmyturn" => clienttranslate('${you} can take back ${resolvingPlaceName} OR 1 discarded Place card (because of Persecution).'),
         "type" => "activeplayer",
@@ -554,7 +554,7 @@ $machinestates = array(
         "possibleactions" => array("actTakeBackPlayedCard", "actTakeBackDiscardedPlace"),
         "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
-        "place" => 2 // or 6 but not really important here, as long as the value exists to play "Drone" and "Gate"
+        "place" => 2
     ),
 
     116 => array(
@@ -598,6 +598,18 @@ $machinestates = array(
         "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 7, "changeActivePlayer" => 98),
         "phase" => 3
+    ),
+
+    120 => array(
+        "name" => "Swamp_Persecution",
+        "description" => clienttranslate('${actplayer} can take back ${resolvingPlaceName} OR 1 discarded Place card (because of Persecution).'),
+        "descriptionmyturn" => clienttranslate('${you} can take back ${resolvingPlaceName} OR 1 discarded Place card (because of Persecution).'),
+        "type" => "activeplayer",
+        "args" => "argsResolvingPlace",
+        "possibleactions" => array("actTakeBackPlayedCard", "actTakeBackDiscardedPlace"),
+        "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
+        "phase" => 3,
+        "place" => 6
     ),
 
     // Hack to workaround the limitation of not being able to change active player between 2 states of type "activeplayer"
