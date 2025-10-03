@@ -557,7 +557,7 @@ define([
                     }
                     break;
             }
-            if (this.isCurrentPlayerActive() && this.gamedatas.gamestate.possibleactions.includes('takeBackDiscardedPlace')) {
+            if (this.isCurrentPlayerActive() && this.gamedatas.gamestate.possibleactions.includes('actTakeBackDiscardedPlace')) {
                 this.player.discard.setSelectionMode(1);
                 this.player.discard.unselectAll();
             }
@@ -688,7 +688,7 @@ define([
                         break;
                     case 'theJungle':
                         if (this.player.discardedPlaces.length === 0) {
-                            this.addActionButton('takeBackPlayedPlaceOnly', dojo.string.substitute(_('Take back ${place} only'), {place: this.getPlaceName(args.resolvingPlace)}), 'onTakeBackPlayedPlaceOnly');
+                            this.addActionButton('takeBackPlayedPlaceOnly_' + args.resolvingPlace, dojo.string.substitute(_('Take back ${place} only'), {place: this.getPlaceName(args.resolvingPlace)}), 'onTakeBackPlayedPlaceOnly');
                         }
                         break;
                     case 'theRiver':
@@ -750,7 +750,7 @@ define([
                         }
                         break;
                     case 'Jungle_Swamp_Persecution':
-                        this.addActionButton('takeBackPlayedPlaceOnly', dojo.string.substitute(_('Take back ${place} only'), {place: this.getPlaceName(args.resolvingPlace)}), 'onTakeBackPlayedPlaceOnly');
+                        this.addActionButton('takeBackPlayedPlaceOnly_' + args.resolvingPlace, dojo.string.substitute(_('Take back ${place} only'), {place: this.getPlaceName(args.resolvingPlace)}), 'onTakeBackPlayedPlaceOnly');
                         if (this.player.discardedPlaces.length) {
                             this.addActionButton('takeBackDiscardedPlace', _('Take back 1 place card'), 'onTakeBackDiscardedPlace');
                         }
@@ -1238,9 +1238,7 @@ define([
 
         onStartHunting: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/chooseBoardSide.html", {lock: true, side: this.gamedatas.boardSide}, this, function (result) {
-            }, function (is_error) {
-            });
+            this.bgaPerformAction('actChooseBoardSide', {side: this.gamedatas.boardSide});
         },
 
         onHandCardSelectionChange: function () {
@@ -1271,7 +1269,7 @@ define([
                         this.explore([]);
                     }
                 }
-            } else if (selectedItems.length === 1 && this.isCurrentPlayerActive() && this.gamedatas.gamestate.possibleactions.includes('discardPlaceCard') && (!this.gamedatas.gamestate.args || this.gamedatas.gamestate.args[this.player_id] !== "2")) {
+            } else if (selectedItems.length === 1 && this.isCurrentPlayerActive() && this.gamedatas.gamestate.possibleactions.includes('actDiscardPlaceCard') && (!this.gamedatas.gamestate.args || this.gamedatas.gamestate.args[this.player_id] !== "2")) {
                 this.discardPlaceCard(selectedItems[0].id);
             } else {
                 if (this.isCurrentPlayerActive() && (this.gamedatas.gamestate.name === 'chooseRiverPlaceCard' || this.gamedatas.gamestate.name === 'chooseArtefactPlaceCard')) {
@@ -1282,24 +1280,19 @@ define([
 
         explore: function (placeCards) {
             var places = placeCards.map(this.getId);
-            this.ajaxcall("/notalone/notalone/exploration.html", {places: places.join(',')}, this,
-              function () {
-                  this.player.playedPlaces = places;
-              }, function (is_error) {
-                  if (is_error) {
-                      this.playerHand.unselectAll();
-                  }
-              });
+            this.bgaPerformAction('actExploration', {
+              places: places.join(',')
+            },{checkAction: false}).then(()=>{
+              this.player.playedPlaces = places;
+            }).catch(()=>{
+              this.playerHand.unselectAll();
+            });
         },
 
         onHuntCardSelected: function (card) {
-            this.ajaxcall("/notalone/notalone/playHuntCard.html", {lock: true, card: card}, this,
-              function () {
-              }, function (is_error) {
-                  if (is_error) {
-                      this.playerHand.unselectItem(card);
-                  }
-              });
+            this.bgaPerformAction('actPlayHuntCard', {cardName: card}, {checkAction: false}).catch(()=>{
+              this.playerHand.unselectItem(card);
+            });
         },
 
         onSurvivalCardSelected: function (card) {
@@ -1316,18 +1309,20 @@ define([
         },
 
         doPlaySurvivalCard: function (card) {
-            var url = "/notalone/notalone/playSurvivalCard.html";
-            if (this.gamedatas.gamestate.possibleactions.includes('discardSurvivalCard')) {
-                url = "/notalone/notalone/discardSurvivalCard.html";
-            }
-            this.ajaxcall(url, {lock: true, card: card}, this,
-              function () {
+            if (this.gamedatas.gamestate.possibleactions.includes('actDiscardSurvivalCard')) {
+                this.bgaPerformAction('actDiscardSurvivalCard', {cardName: card}).then(()=>{
                   this.playerHand.unselectItem(card);
-              }, function (is_error) {
-                  if (is_error) {
-                      this.playerHand.unselectItem(card);
-                  }
+                }).catch(()=>{
+                  this.playerHand.unselectItem(card);
+                });
+            }
+            else {
+              this.bgaPerformAction('actPlaySurvivalCard', {cardName: card}, {checkAction: false}).then(()=>{
+                this.playerHand.unselectItem(card);
+              }).catch(()=>{
+                this.playerHand.unselectItem(card);
               });
+            }
         },
 
         onDiscardSelectionChange: function () {
@@ -1353,10 +1348,7 @@ define([
             if (this.isCurrentPlayerActive() && selectedPlaces.length === 1) {
                 switch (this.gamedatas.gamestate.name) {
                     case 'theJungle':
-                        this.ajaxcall("/notalone/notalone/theJungle.html", {lock: true, place: selectedPlaces[0].type}, this,
-                          function () {
-                          }, function (is_error) {
-                          });
+                        this.bgaPerformAction('actTheJungle', {place : selectedPlaces[0].type});
                         break;
                     case 'vortex':
                         if (this.player.playedPlaces.length === 1) {
@@ -1383,14 +1375,12 @@ define([
         },
 
         doSwap: function (place, swappedPlace) {
-            this.ajaxcall("/notalone/notalone/swapPlaceCard.html", {lock: true, place: place, swappedPlace: swappedPlace}, this,
-              function () {
-                  dojo.query('#artemia_item_' + swappedPlace + ' .huntedName[data-value="' + this.player_id + '"]').forEach(dojo.destroy);
-                  this.displayPlayerOnPlace(this.player, place, false);
-                  var swappedIndex = this.player.playedPlaces.indexOf(swappedPlace);
-                  this.player.playedPlaces[swappedIndex] = place;
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actSwapPlaceCard', {place: place, swappedPlace: swappedPlace}).then(() => {
+              dojo.query('#artemia_item_' + swappedPlace + ' .huntedName[data-value="' + this.player_id + '"]').forEach(dojo.destroy);
+              this.displayPlayerOnPlace(this.player, place, false);
+              var swappedIndex = this.player.playedPlaces.indexOf(swappedPlace);
+              this.player.playedPlaces[swappedIndex] = place;
+            });
         },
 
         onResist: function (event) {
@@ -1420,10 +1410,9 @@ define([
         },
 
         doResist: function (places) {
-            this.ajaxcall("/notalone/notalone/resist.html", {lock: true, places: places.join(',')}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actResist', {
+              places: places.join(',')
+            });
         },
 
         onGiveUp: function (event) {
@@ -1437,10 +1426,7 @@ define([
         },
 
         doGiveUp: function () {
-            this.ajaxcall("/notalone/notalone/giveUp.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actGiveUp');
         },
 
         onPlaceCreatureToken: function (event) {
@@ -1459,10 +1445,7 @@ define([
         },
 
         onPlaceToken: function (tokenType, position) {
-            this.ajaxcall("/notalone/notalone/placeToken.html", {lock: true, tokenType: tokenType, position: position}, this,
-              function (result) {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actPlaceToken',{tokenType: tokenType, position: position});
         },
 
         onChooseHuntedPlayer: function (event) {
@@ -1474,10 +1457,7 @@ define([
             var playerId = playerBoard.id.split('_')[3];
             switch (this.gamedatas.gamestate.name) {
                 case 'theSource':
-                    this.ajaxcall("/notalone/notalone/regainWill.html", {lock: true, playerId: playerBoard.id.split('_')[3]}, this,
-                      function (result) {
-                      }, function (is_error) {
-                      });
+                    this.bgaPerformAction('actRegainWill',{playerId: playerBoard.id.split('_')[3]});
                     break;
                 case 'detour':
                     this.detour = {lock: true};
@@ -1496,60 +1476,40 @@ define([
                     });
                     break;
                 default:
-                    this.ajaxcall("/notalone/notalone/chooseHuntedPlayer.html", {lock: true, playerId: playerId}, this,
-                      function (result) {
-                      }, function (is_error) {
-                      });
+                    this.bgaPerformAction('actChooseHuntedPlayer', {huntedPlayerId: playerId});
                     break;
             }
         },
 
         onTakeBackDiscardedCards: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/takeBackDiscardedPlaceCards.html", {lock: true}, this,
-              function (result) {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTakeBackDiscardedPlaceCards');
         },
 
         onCopyCreaturePlace: function (event) {
             dojo.stopEvent(event);
             var place = event.target.id.split('_')[1];
-            this.ajaxcall("/notalone/notalone/copyCreaturePlace.html", {lock: true, place: place}, this,
-              function (result) {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actCopyCreaturePlace', {place: place});
         },
 
         onTakeBackPlayedPlaceOnly: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/takeBackPlayedCard.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            var place = event.target.id.split('_')[1];
+            this.bgaPerformAction('actTakeBackPlayedCard', {place: place});
         },
 
         onUseTheRiver: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/theRiver.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheRiver');
         },
 
         onChooseRiverPlaceCard: function (place) {
-            this.ajaxcall("/notalone/notalone/chooseRiverPlaceCard.html", {lock: true, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actChooseRiverPlaceCard', {place: place});
         },
 
         onUseTheBeach: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/theBeach.html", {lock: true}, this,
-              function (result) {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheBeach');
         },
 
         onClickArtemiaPlace: function (event) {
@@ -1590,10 +1550,7 @@ define([
                     }
                     if (this.detour.origin) {
                         this.detour.destination = placeElement.id.split('_')[2];
-                        this.ajaxcall("/notalone/notalone/moveHunted.html", this.detour, this,
-                          function () {
-                          }, function (is_error) {
-                          });
+                        this.bgaPerformAction('actMoveHunted', {huntedId: this.detour.huntedId, origin: this.detour.origin, destination: this.detour.destination});
                     } else {
                         this.detour.origin = placeElement.id.split('_')[2];
                         dojo.query("#artemia .stockitem.selectable").forEach(function (element) {
@@ -1603,20 +1560,15 @@ define([
                     }
                     break;
                 case 'doubleBack':
-                    this.ajaxcall("/notalone/notalone/takeBackPlayedCard.html", {place: placeElement.id.split('_')[2]}, this,
-                      function () {
-                      }, function (is_error) {
-                      });
+                    console.log(placeElement.id);
+                    this.bgaPerformAction('actTakeBackPlayedCard',{place: placeElement.id.split('_')[2]});
                     break;
             }
         },
 
         onTakeNewPlace: function (placeElement) {
             var place = placeElement.id.split('_')[2];
-            this.ajaxcall("/notalone/notalone/theRover.html", {lock: true, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheRover', {place: place});
         },
 
         onUseTheSwamp: function (event) {
@@ -1630,60 +1582,40 @@ define([
             } else {
                 places = this.player.discard.getSelectedItems().map(this.getId);
             }
-            this.ajaxcall("/notalone/notalone/theSwamp.html", {lock: true, places: places.join(',')}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheSwamp', {places: places.join(',')});
         },
 
         onUseTheShelter: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/theShelter.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheShelter');
         },
 
         onSurvivalCardChosen: function () {
             var selectedItems = this.choiceStock.getSelectedItems();
             if (selectedItems.length === 1) {
                 var card = selectedItems[0].id;
-                this.ajaxcall("/notalone/notalone/chooseSurvivalCard.html", {lock: true, card: card}, this,
-                  function () {
-                  }, function (is_error) {
-                  });
+                console.log(card);
+                this.bgaPerformAction('actChooseSurvivalCard', {cardName: card});
             }
         },
 
         onUseTheWreck: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/theWreck.html", {lock: true}, this,
-              function (result) {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheWreck');
         },
 
         onDrawSurvivalCard: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/drawSurvivalCard.html", {lock: true}, this,
-              function (result) {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actDrawSurvivalCard');
         },
 
         onUseTheArtefact: function (event) {
             dojo.stopEvent(event);
-            this.ajaxcall("/notalone/notalone/theArtefact.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actTheArtefact');
         },
 
         onChooseArtefactPlaceCard: function (place) {
-            this.ajaxcall("/notalone/notalone/chooseArtefactPlaceCard.html", {lock: true, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actChooseArtefactPlaceCard', {place: place});
         },
 
         onTakeBackDiscardedPlace: function () {
@@ -1693,11 +1625,9 @@ define([
                 this.showMessage(_("Please select first 1 Place card from your discard to take back in hand."), 'info')
             } else {
                 var place = selectedItems[0].type;
-                this.ajaxcall("/notalone/notalone/takeBackDiscardedPlace.html", {lock: true, place: place}, this,
-                  function () {
-                      this.playerHand.addToStockWithId(place, place, "discard_player_" + playerId);
-                  }, function (is_error) {
-                  });
+                this.bgaPerformAction('actTakeBackDiscardedPlace', {place: place}).then(()=>{
+                  this.playerHand.addToStockWithId(place, place, "discard_player_" + playerId);
+                });
             }
         },
 
@@ -1705,10 +1635,7 @@ define([
             if (this.gamedatas.gamestate.name === 'artemiaTokenEffects' && this.gamedatas.gamestate.args[this.player_id].length === 2) {
                 return;
             }
-            this.ajaxcall("/notalone/notalone/discardPlaceCard.html", {lock: true, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actDiscardPlaceCard', {place: place});
         },
 
         onTakeBack2PlaceCards: function (event) {
@@ -1717,32 +1644,24 @@ define([
             if (selectedPlaces.length !== 2) {
                 this.showMessage(_("Please select first 2 Place cards from your discard to take back in hand."), 'info')
             } else {
-                this.ajaxcall("/notalone/notalone/takeBack2PlaceCards.html", {lock: true, places: selectedPlaces.join(',')}, this,
-                  function () {
-                  }, function (is_error) {
-                  });
+                this.bgaPerformAction('actTakeBack2PlaceCards', {places: selectedPlaces.join(',')});
             }
         },
 
         onDiscardSelection: function (event) {
             dojo.stopEvent(event);
             var selectedPlaces = this.playerHand.getSelectedItems().map(this.getId);
-            this.ajaxcall("/notalone/notalone/discardPlaceCards.html", {lock: true, places: selectedPlaces.join(',')}, this,
-              function () {
-                  for (var i = 0; i < selectedPlaces.length; i++) {
-                      this.playerHand.removeFromStockById(selectedPlaces[i]);
-                  }
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actDiscardPlaceCards', {places: selectedPlaces.join(',')}).then(()=>{
+              for (var i = 0; i < selectedPlaces.length; i++) {
+                  this.playerHand.removeFromStockById(selectedPlaces[i]);
+              }
+            });
         },
 
         onShowSelection: function (event) {
             dojo.stopEvent(event);
             var selectedPlaces = this.playerHand.getSelectedItems().map(this.getId);
-            this.ajaxcall("/notalone/notalone/showPlaces.html", {lock: true, places: selectedPlaces.join(',')}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actShowPlaces', {places: selectedPlaces.join(',')});
         },
 
         onConfirmReckoningPass: function () {
@@ -1752,41 +1671,26 @@ define([
         },
 
         onPass: function () {
-            if (!this.isCurrentPlayerActive() || !this.gamedatas.gamestate.possibleactions.includes('pass')) {
+            if (!this.isCurrentPlayerActive() || !this.gamedatas.gamestate.possibleactions.includes('actPass')) {
                 return;
             }
-            this.ajaxcall("/notalone/notalone/pass.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actPass');
         },
 
         onLoseWill: function () {
-            this.ajaxcall("/notalone/notalone/loseWill.html", {lock: true}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actLoseWill');
         },
 
         onCopyAdjacentPlace: function (place) {
-            this.ajaxcall("/notalone/notalone/copyAdjacentPlace.html", {lock: true, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actCopyAdjacentPlace', {place: place});
         },
 
         onMoveHuntToken: function (place) {
-            this.ajaxcall("/notalone/notalone/moveHuntToken.html", {lock: true, tokenType: this.gamedatas.gamestate.token, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actMoveHuntToken', {tokenType: this.gamedatas.gamestate.token, place: place});
         },
 
         onChooseIneffectivePlace: function (place) {
-            this.ajaxcall("/notalone/notalone/chooseIneffectivePlace.html", {lock: true, place: place}, this,
-              function () {
-              }, function (is_error) {
-              });
+            this.bgaPerformAction('actChooseIneffectivePlace', {place: place});
         },
 
         onClickHuntToken: function (event) {

@@ -68,7 +68,7 @@ $machinestates = array(
         "description" => clienttranslate('You crashed on Artemia. You are Not Alone. ${actplayer} is hunting you! (${actplayer} must choose the board side)'),
         "descriptionmyturn" => clienttranslate('${you} are the creature. Select a side for the board.'),
         "type" => "activeplayer",
-        "possibleactions" => array("chooseBoardSide"),
+        "possibleactions" => array("actChooseBoardSide"),
         "transitions" => array("" => 3),
         "phase" => 0
     ),
@@ -79,7 +79,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Exploration: ${you} must play one Place card, and you may play Phase 1 cards.'),
         "type" => "multipleactiveplayer",
         "action" => "stExploration",
-        "possibleactions" => array("exploration", "resist", "giveUp", "pass"),
+        "possibleactions" => array("actExploration", "actResist", "actGiveUp", "actPass"),
         "transitions" => array("hunting" => 98, "endOfGame" => 99, "force-field" => 20, "sacrifice" => 21, "sixth-sense" => 22),
         "updateGameProgression" => true,
         "phase" => 1
@@ -92,7 +92,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "action" => "stHunting",
         "args" => "argsHunting",
-        "possibleactions" => array("placeToken"),
+        "possibleactions" => array("actPlaceToken"),
         "transitions" => array("refreshState" => 4, "phase2Cards" => 5, "forbidden-zone" => 26, "changeActivePlayer" => 98, "zombiePass" => 99),
         "phase" => 2
     ),
@@ -103,7 +103,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Hunting: ${you} may play Phase 2 cards.'),
         "type" => "multipleactiveplayer",
         "action" => "stActivatePlayersWhoMightPlayACard",
-        "possibleactions" => array("pass"),
+        "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 111, "forbidden-zone" => 26, "vortex" => 31, "changeActivePlayer" => 98),
         "phase" => 2
     ),
@@ -114,7 +114,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Reckoning: ${you} may play Phase 3 cards.'),
         "type" => "multipleactiveplayer",
         "action" => "stStartReckoning",
-        "possibleactions" => array("pass"),
+        "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 7, "changeActivePlayer" => 98),
         "phase" => 3
     ),
@@ -146,7 +146,7 @@ $machinestates = array(
         "type" => "multipleactiveplayer",
         "action" => "stArtemiaTokenEffects",
         "args" => "argsArtemiaTokenEffects",
-        "possibleactions" => array("discardPlaceCard", "discardPlaceCards"),
+        "possibleactions" => array("actDiscardPlaceCard", "actDiscardPlaceCards"),
         "transitions" => array("" => 10),
         "phase" => 3
     ),
@@ -166,7 +166,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('End of turn: ${you} may play Phase 4 cards.'),
         "type" => "multipleactiveplayer",
         "action" => "stActivatePlayersWhoMightPlayACard",
-        "possibleactions" => array("pass"),
+        "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 12, "double-back" => 38, "endOfGame" => 99),
         "phase" => 4
     ),
@@ -185,7 +185,7 @@ $machinestates = array(
         "description" => clienttranslate('Force Field: ${actplayer} must target 2 adjacent places.'),
         "descriptionmyturn" => clienttranslate('Force Field: ${you} must target 2 adjacent places.'),
         "type" => "activeplayer",
-        "possibleactions" => array("placeToken"),
+        "possibleactions" => array("actPlaceToken"),
         "transitions" => array("exploration" => 3, "zombiePass" => 99),
         "phase" => 1
     ),
@@ -195,7 +195,7 @@ $machinestates = array(
         "description" => clienttranslate('Sacrifice: ${actplayer} must discard 1 Place card.'),
         "descriptionmyturn" => clienttranslate('Sacrifice: ${you} must discard 1 Place card.'),
         "type" => "activeplayer",
-        "possibleactions" => array("discardPlaceCard", "resist", "giveUp"),
+        "possibleactions" => array("actDiscardPlaceCard", "actResist", "actGiveUp"),
         "transitions" => array("" => 3),
         "phase" => 1
     ),
@@ -205,7 +205,7 @@ $machinestates = array(
         "description" => clienttranslate('Sixth Sense: ${actplayer} takes back 2 Place cards from its discard pile.'),
         "descriptionmyturn" => clienttranslate('Sixth Sense: ${you} take back 2 Place cards from your discard pile.'),
         "type" => "activeplayer",
-        "possibleactions" => array("takeBack2PlaceCards"),
+        "possibleactions" => array("actTakeBack2PlaceCards"),
         "transitions" => array("" => 3),
         "phase" => 1
     ),
@@ -215,7 +215,7 @@ $machinestates = array(
         "description" => clienttranslate('Anticipation: ${actplayer} must choose one Hunted.'),
         "descriptionmyturn" => clienttranslate('Anticipation: ${you} must choose one Hunted.'),
         "type" => "activeplayer",
-        "possibleactions" => array("chooseHuntedPlayer"),
+        "possibleactions" => array("actChooseHuntedPlayer"),
         "transitions" => array("hunting" => 4, "zombiePass" => 99),
         "phase" => 2
     ),
@@ -225,7 +225,7 @@ $machinestates = array(
         "description" => clienttranslate('Ascendancy: ${actplayer} must choose one Hunted to discard all but 2 Place cards.'),
         "descriptionmyturn" => clienttranslate('Ascendancy: ${you} must choose one Hunted to discard all but 2 Place cards.'),
         "type" => "activeplayer",
-        "possibleactions" => array("chooseHuntedPlayer"),
+        "possibleactions" => array("actChooseHuntedPlayer"),
         "transitions" => array("changeActivePlayer" => 98, "zombiePass" => 99),
         "phase" => 2
     ),
@@ -235,7 +235,7 @@ $machinestates = array(
         "description" => clienttranslate('Ascendancy: ${actplayer} must discard all but 2 Place cards.'),
         "descriptionmyturn" => clienttranslate('Ascendancy: ${you} must discard all but 2 Place cards.'),
         "type" => "activeplayer",
-        "possibleactions" => array("discardPlaceCards"),
+        "possibleactions" => array("actDiscardPlaceCards"),
         "transitions" => array("" => 98),
         "phase" => 2
     ),
@@ -245,7 +245,7 @@ $machinestates = array(
         "description" => clienttranslate('Forbidden Zone: All Hunted discard 1 Place card simultaneously.'),
         "descriptionmyturn" => clienttranslate('Forbidden Zone: ${you} must discard 1 Place card.'),
         "type" => "multipleactiveplayer",
-        "possibleactions" => array("discardPlaceCard"),
+        "possibleactions" => array("actDiscardPlaceCard"),
         "transitions" => array("" => 4),
         "phase" => 2
     ),
@@ -255,7 +255,7 @@ $machinestates = array(
         "description" => clienttranslate('Phobia: ${actplayer} must choose which Hunted will reveal all but 2 Place cards.'),
         "descriptionmyturn" => clienttranslate('Phobia: ${you} must choose which Hunted will show you all but 2 Place cards.'),
         "type" => "activeplayer",
-        "possibleactions" => array("chooseHuntedPlayer"),
+        "possibleactions" => array("actChooseHuntedPlayer"),
         "transitions" => array("changeActivePlayer" => 98, "zombiePass" => 99),
         "phase" => 2
     ),
@@ -265,7 +265,7 @@ $machinestates = array(
         "description" => clienttranslate('Phobia: ${actplayer} must reveal all but 2 Place cards to the Creature.'),
         "descriptionmyturn" => clienttranslate('Phobia: ${you} must reveal all but 2 Place cards to the Creature.'),
         "type" => "activeplayer",
-        "possibleactions" => array("showPlaces"),
+        "possibleactions" => array("actShowPlaces"),
         "transitions" => array("" => 98),
         "phase" => 2
     ),
@@ -275,7 +275,7 @@ $machinestates = array(
         "description" => clienttranslate('Scream: Each Hunted on the targeted place must discard 2 Place cards or lose 1 Will.'),
         "descriptionmyturn" => clienttranslate('Scream: ${you} must discard 2 Place cards or lose 1 Will.'),
         "type" => "multipleactiveplayer",
-        "possibleactions" => array("discardPlaceCards", "loseWill"),
+        "possibleactions" => array("actDiscardPlaceCards", "actLoseWill"),
         "transitions" => array("" => 8),
         "phase" => 3
     ),
@@ -285,7 +285,7 @@ $machinestates = array(
         "description" => clienttranslate('Toxin: Each Hunted on the targeted place discards 1 Survival card.'),
         "descriptionmyturn" => clienttranslate('Toxin: ${you} must discard 1 Survival card.'),
         "type" => "multipleactiveplayer",
-        "possibleactions" => array("discardSurvivalCard"),
+        "possibleactions" => array("actDiscardSurvivalCard"),
         "transitions" => array("" => 8),
         "phase" => 3
     ),
@@ -295,7 +295,7 @@ $machinestates = array(
         "description" => clienttranslate('Vortex: ${actplayer} swap its played Place card for one Place card from its discard pile.'),
         "descriptionmyturn" => clienttranslate('Vortex: ${you} must choose a Place card from you discard pile.'),
         "type" => "activeplayer",
-        "possibleactions" => array("swapPlaceCard"),
+        "possibleactions" => array("actSwapPlaceCard"),
         "transitions" => array("" => 98),
         "phase" => 2
     ),
@@ -306,7 +306,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Gate: ${you} must choose an place adjacent to ${resolvingPlaceName} to copy its power.'),
         "type" => "activeplayer",
         "args" => "argsResolvingPlace",
-        "possibleactions" => array("copyAdjacentPlace"),
+        "possibleactions" => array("actCopyAdjacentPlace"),
         "transitions" => array(1 => 101, 2 => 102, 3 => 103, 4 => 104, 5 => 105, 6 => 106, 7 => 107, 8 => 108, 9 => 109),
         "phase" => 3
     ),
@@ -317,7 +317,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Hologram: ${you} must move the Artemia token to an adjacent place.'),
         "type" => "activeplayer",
         "args" => "argsHuntTokenAdjacentPlaces",
-        "possibleactions" => array("moveHuntToken"),
+        "possibleactions" => array("actMoveHuntToken"),
         "transitions" => array("continue" => 117),
         "phase" => 3,
         "token" => "artemia"
@@ -330,7 +330,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "action" => "stWrongTrack",
         "args" => "argsHuntTokenAdjacentPlaces",
-        "possibleactions" => array("moveHuntToken"),
+        "possibleactions" => array("actMoveHuntToken"),
         "transitions" => array("continue" => 117, "clone" => 35),
         "phase" => 3,
         "token" => "creature"
@@ -342,7 +342,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Wrong Track: ${you} must move the Creature or its Clone to an adjacent place.'),
         "type" => "activeplayer",
         "args" => "argsWrongTrackClone",
-        "possibleactions" => array("moveHuntToken"),
+        "possibleactions" => array("actMoveHuntToken"),
         "transitions" => array("continue" => 117),
         "phase" => 3
     ),
@@ -352,7 +352,7 @@ $machinestates = array(
         "description" => clienttranslate('Cataclysm: ${actplayer} chooses which Place will be ineffective.'),
         "descriptionmyturn" => clienttranslate('Cataclysm: ${you} must choose which Place will be ineffective.'),
         "type" => "activeplayer",
-        "possibleactions" => array("chooseIneffectivePlace"),
+        "possibleactions" => array("actChooseIneffectivePlace"),
         "transitions" => array("continue" => 7, "zombiePass" => 99),
         "phase" => 3
     ),
@@ -362,7 +362,7 @@ $machinestates = array(
         "description" => clienttranslate('Detour: ${actplayer} moves one Hunted to an adjacent place.'),
         "descriptionmyturn" => clienttranslate('Detour: ${you} must move one Hunted to an adjacent place.'),
         "type" => "activeplayer",
-        "possibleactions" => array("moveHunted"),
+        "possibleactions" => array("actMoveHunted"),
         "transitions" => array("continue" => 119, "zombiePass" => 99),
         "phase" => 3
     ),
@@ -372,7 +372,7 @@ $machinestates = array(
         "description" => clienttranslate('Double Back: ${actplayer} must choose which Place he takes back.'),
         "descriptionmyturn" => clienttranslate('Double Back: ${you} must choose which Place you take back.'),
         "type" => "activeplayer",
-        "possibleactions" => array("takeBackPlayedCard"),
+        "possibleactions" => array("actTakeBackPlayedCard"),
         "transitions" => array("" => 11),
         "phase" => 4
     ),
@@ -384,7 +384,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
         "args" => "argsTheLairState",
-        "possibleactions" => array("takeBackDiscardedPlaceCards", "copyCreaturePlace"),
+        "possibleactions" => array("actTakeBackDiscardedPlaceCards", "actCopyCreaturePlace"),
         "transitions" => array(2 => 102, 3 => 103, 4 => 104, 5 => 105, 6 => 106, 7 => 107, 8 => 108, 9 => 109, "continue" => 7, "persecution" => 114, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 1
@@ -397,7 +397,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
         "args" => "argsResolvingPlace",
-        "possibleactions" => array("takeBackPlayedCard", "theJungle"),
+        "possibleactions" => array("actTakeBackPlayedCard", "actTheJungle"),
         "transitions" => array("continue" => 7, "persecution" => 115, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 2
@@ -409,7 +409,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can use the River OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("theRiver", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actTheRiver", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 3
@@ -421,7 +421,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can use the Beach OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("theBeach", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actTheBeach", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("continue" => 7, "endOfGame" => 99, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 4
@@ -433,7 +433,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can take a new Place from the reserve OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("theRover", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actTheRover", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("continue" => 7, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 5
@@ -446,7 +446,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
         "args" => "argsResolvingPlace",
-        "possibleactions" => array("theSwamp"),
+        "possibleactions" => array("actTheSwamp"),
         "transitions" => array("continue" => 7, "persecution" => 115, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 6
@@ -458,7 +458,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can draw 2 Survival cards and keep 1 OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("theShelter", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actTheShelter", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("chooseSurvivalCard" => 112, "continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 7
@@ -470,7 +470,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can move the Rescue counter forward 1 space OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("theWreck", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actTheWreck", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("continue" => 7, "endOfGame" => 99, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 8
@@ -482,7 +482,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can choose a Hunted player to regain 1 Will OR draw 1 Survival card OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("regainWill", "drawSurvivalCard", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actRegainWill", "actDrawSurvivalCard", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98, "playSurvivalCardDrawn" => 116),
         "phase" => 3,
         "place" => 9
@@ -494,7 +494,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can use the Artefact OR take back 1 discarded Place card.'),
         "type" => "activeplayer",
         "action" => "stPlaceReckoning",
-        "possibleactions" => array("theArtefact", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actTheArtefact", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 10
@@ -506,7 +506,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must choose which Place card you reveal.'),
         "type" => "multipleactiveplayer",
         "action" => "stChooseRiverPlaceCard",
-        "possibleactions" => array("chooseRiverPlaceCard"),
+        "possibleactions" => array("actChooseRiverPlaceCard"),
         "transitions" => array("" => 6),
         "phase" => 3
     ),
@@ -517,7 +517,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must choose one Survival card and discard the second.'),
         "type" => "activeplayer",
         "args" => "argsChooseSurvivalCard",
-        "possibleactions" => array("chooseSurvivalCard"),
+        "possibleactions" => array("actChooseSurvivalCard"),
         "transitions" => array("playSurvivalCardDrawn" => 116),
         "phase" => 3
     ),
@@ -528,7 +528,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must choose which place you resolve first.'),
         "type" => "activeplayer",
         "args" => "argsChooseArtefactPlaceCard",
-        "possibleactions" => array("chooseArtefactPlaceCard"),
+        "possibleactions" => array("actChooseArtefactPlaceCard"),
         "transitions" => array(1 => 101, 2 => 102, 3 => 103, 4 => 104, 5 => 105, 6 => 106, 7 => 107, 8 => 108, 9 => 109, 10 => 110, "changeActivePlayer" => 98),
         "phase" => 3
     ),
@@ -539,7 +539,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can copy the power of the place with the Creature token OR take back 1 Place card (because of Persecution).'),
         "type" => "activeplayer",
         "args" => "argsTheLairState",
-        "possibleactions" => array("copyCreaturePlace", "takeBackDiscardedPlace", "pass"),
+        "possibleactions" => array("actCopyCreaturePlace", "actTakeBackDiscardedPlace", "actPass"),
         "transitions" => array(2 => 102, 3 => 103, 4 => 104, 5 => 105, 6 => 106, 7 => 107, 8 => 108, 9 => 109, "continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 1
@@ -551,7 +551,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} can take back ${resolvingPlaceName} OR 1 discarded Place card (because of Persecution).'),
         "type" => "activeplayer",
         "args" => "argsResolvingPlace",
-        "possibleactions" => array("takeBackPlayedCard", "takeBackDiscardedPlace"),
+        "possibleactions" => array("actTakeBackPlayedCard", "actTakeBackDiscardedPlace"),
         "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3,
         "place" => 2 // or 6 but not really important here, as long as the value exists to play "Drone" and "Gate"
@@ -563,7 +563,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('Reckoning: ${you} may play Phase 3 cards.'),
         "type" => "activeplayer",
         "action" => "stPlaySurvivalCardDrawn",
-        "possibleactions" => array("pass"),
+        "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 7, "drone" => 105, "gate" => 32, "changeActivePlayer" => 98),
         "phase" => 3
     ),
@@ -583,7 +583,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} may play Phase 3 cards in response to ${card_name}.'),
         "type" => "activeplayer",
         "args" => "argsPreviousSurvivalCardPlayed",
-        "possibleactions" => array("pass"),
+        "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 7, "changeActivePlayer" => 98),
         "phase" => 3
     ),
@@ -595,7 +595,7 @@ $machinestates = array(
         "type" => "multipleactiveplayer",
         "args" => "argsPreviousHuntCardPlayed",
         "action" => "stActivatePlayersWhoMightPlayACard",
-        "possibleactions" => array("pass"),
+        "possibleactions" => array("actPass"),
         "transitions" => array("continue" => 7, "changeActivePlayer" => 98),
         "phase" => 3
     ),

@@ -18,6 +18,8 @@
 
 
 require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
+use \Bga\GameFramework\Actions\Types\IntArrayParam;
+use \Bga\GameFramework\Actions\CheckAction;
 
 
 class NotAlone extends Table
@@ -819,9 +821,8 @@ class NotAlone extends Table
         (note: each method below must match an input method in notalone.action.php)
     */
 
-    function chooseBoardSide($side)
+    function actChooseBoardSide(int $side)
     {
-        self::checkAction('chooseBoardSide');
         if ($side != 1 && $side != 2) {
             throw new BgaVisibleSystemException("Illegal board side: " . $side);
         }
@@ -842,9 +843,10 @@ class NotAlone extends Table
         }
     }
 
-    function exploration($places)
+    #[CheckAction(false)]
+    function actExploration(#[IntArrayParam()] array $places)
     {
-        $this->gamestate->checkPossibleAction('exploration');
+        $this->gamestate->checkPossibleAction('actExploration');
         $playerId = self::getCurrentPlayerId();
         $willCounters = self::getUniqueValueFromDB("SELECT will_counters FROM player WHERE player_id = $playerId");
         if ($willCounters == 0) {
@@ -877,9 +879,8 @@ class NotAlone extends Table
         }
     }
 
-    function resist($places)
+    function actResist(#[IntArrayParam()] array $places)
     {
-        $this->checkAction('resist');
         if (sizeof($places) == 0) {
             throw new BgaVisibleSystemException("You must take back at least one place card.");
         } else if (sizeof($places) > 2) {
@@ -920,9 +921,8 @@ class NotAlone extends Table
         self::notifyAllPlayers("willCounterLost", '', array('playerId' => $playerId));
     }
 
-    function giveUp()
+    function actGiveUp()
     {
-        $this->checkAction('giveUp');
         $playerId = self::getCurrentPlayerId();
         $willCounters = self::getUniqueValueFromDB("SELECT will_counters FROM player WHERE player_id = $playerId");
         $discardPlaces = self::getCollectionFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'DISCARD'", true);
@@ -938,9 +938,8 @@ class NotAlone extends Table
         $this->moveAssimilationCounter(clienttranslate('The ${begin_assimilation}Assimilation counter${end_assimilation} moves forward!'));
     }
 
-    function placeToken($tokenType, $position)
+    function actPlaceToken(string $tokenType, int $position)
     {
-        self::checkAction('placeToken');
         if ($this->gamestate->state()['name'] == 'forceField' && $tokenType != 'target') {
             throw new BgaVisibleSystemException("You can only place the target token with Force Field.");
         }
@@ -996,9 +995,8 @@ class NotAlone extends Table
         }
     }
 
-    function swapPlaceCard($place, $swappedPlace)
+    function actSwapPlaceCard(int $place, int $swappedPlace)
     {
-        self::checkAction('swapPlaceCard');
         $playerId = self::getActivePlayerId();
         $discardOrder = self::getUniqueValueFromDB("SELECT discard_order FROM hunted_place_card WHERE hunted_player_id = $playerId AND place_number = $place AND location = 'DISCARD'");
         if ($discardOrder == null) {
@@ -1020,9 +1018,8 @@ class NotAlone extends Table
         $this->gamestate->nextState('hunting');
     }
 
-    function takeBackDiscardedPlaceCards()
+    function actTakeBackDiscardedPlaceCards()
     {
-        self::checkAction('takeBackDiscardedPlaceCards');
         $playerId = self::getActivePlayerId();
         $number = self::getUniqueValueFromDB("SELECT count(*) FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'DISCARD'");
         self::DbQuery("UPDATE hunted_place_card SET location = 'HAND', discard_order = null WHERE hunted_player_id = $playerId AND location = 'DISCARD'");
@@ -1033,9 +1030,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function copyCreaturePlace($place)
+    function actCopyCreaturePlace(int $place)
     {
-        self::checkAction('copyCreaturePlace');
         if (!in_array($place, $this->getCreaturePlaces())) {
             throw new BgaVisibleSystemException("The Creature is not on this place.");
         }
@@ -1054,17 +1050,15 @@ class NotAlone extends Table
                 'place_icon' => $this->getPlaceIcon($place)));
     }
 
-    function theJungle($place)
+    function actTheJungle(int $place)
     {
-        self::checkAction('theJungle');
         $this->takeBackResolvedPlace();
         $this->activePlayerTakesBackDiscardedPlace($place);
         $this->gamestate->nextState("continue");
     }
 
-    function theRiver()
+    function actTheRiver()
     {
-        self::checkAction('theRiver');
         $playerId = self::getActivePlayerId();
         $placePendingEffect = self::getUniqueValueFromDB("SELECT place_pending_effect FROM player WHERE player_id = $playerId");
         if ($placePendingEffect != null) {
@@ -1077,9 +1071,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function chooseRiverPlaceCard($place)
+    function actChooseRiverPlaceCard(int $place)
     {
-        self::checkAction('chooseRiverPlaceCard');
         $playerId = self::getCurrentPlayerId();
         if (self::getObjectFromDB("SELECT 1 FROM hunted_place_card WHERE hunted_player_id = $playerId AND place_number = $place AND location = 'PLAYED'") == null) {
             throw new BgaUserException(self::_("You must select one of the Places you played this turn."));
@@ -1089,9 +1082,8 @@ class NotAlone extends Table
         $this->gamestate->setPlayerNonMultiactive($playerId, "");
     }
 
-    function theBeach()
+    function actTheBeach()
     {
-        self::checkAction('theBeach');
         if (self::getGameStateValue('beach_used') == 1) {
             throw new BgaUserException(self::_("The Beach has already been used this turn."));
         }
@@ -1110,9 +1102,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function theRover($place)
+    function actTheRover(int $place)
     {
-        self::checkAction('theRover');
         if ($place < 1 || $place > 10) {
             throw new BgaVisibleSystemException("Illegal place number: " . $place);
         }
@@ -1135,9 +1126,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function theSwamp($places)
+    function actTheSwamp(#[IntArrayParam()] array $places)
     {
-        $this->checkAction('theSwamp');
         if (count($places) > 2) {
             throw new BgaUserException(self::_("You cannot take back more than 2 Place cards"));
         }
@@ -1148,9 +1138,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function theShelter()
+    function actTheShelter()
     {
-        self::checkAction('theShelter');
         if (self::getGameStateValue('despair') == 1) {
             throw new BgaUserException(self::_('No survival cards can be drawn this turn because the Creature played "Despair".'));
         }
@@ -1164,9 +1153,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("chooseSurvivalCard");
     }
 
-    function chooseSurvivalCard($cardName)
+    function actChooseSurvivalCard(string $cardName)
     {
-        self::checkAction('chooseSurvivalCard');
         $cards = $this->survivalDeck->getCardsOfType($cardName);
         if (empty($cards)) {
             throw new BgaVisibleSystemException("Unexpected survival card: " . $cardName);
@@ -1188,9 +1176,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("playSurvivalCardDrawn");
     }
 
-    function theWreck()
+    function actTheWreck()
     {
-        self::checkAction('theWreck');
         if (self::getGameStateValue('wreck_used') == 1) {
             throw new BgaUserException(self::_("The Wreck has already been used this turn."));
         }
@@ -1203,9 +1190,8 @@ class NotAlone extends Table
         }
     }
 
-    function regainWill($playerId)
+    function actRegainWill(int $playerId)
     {
-        self::checkAction('regainWill');
         $willCounters = self::getUniqueValueFromDB("SELECT will_counters FROM player WHERE player_id = $playerId");
         if ($willCounters != 1 && $willCounters != 2) {
             throw new BgaVisibleSystemException("Illegal player: " . $playerId);
@@ -1223,9 +1209,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function drawSurvivalCard()
+    function actDrawSurvivalCard()
     {
-        self::checkAction('drawSurvivalCard');
         if (self::getGameStateValue('despair') == 1) {
             throw new BgaUserException(self::_('No survival cards can be drawn this turn because the Creature played "Despair".'));
         }
@@ -1237,9 +1222,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("playSurvivalCardDrawn");
     }
 
-    function theArtefact()
+    function actTheArtefact()
     {
-        self::checkAction('theArtefact');
         $playerId = self::getActivePlayerId();
         $placePendingEffect = self::getUniqueValueFromDB("SELECT place_pending_effect FROM player WHERE player_id = $playerId");
         if ($placePendingEffect != null) {
@@ -1252,9 +1236,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function chooseArtefactPlaceCard($place)
+    function actChooseArtefactPlaceCard(int $place)
     {
-        self::checkAction('chooseArtefactPlaceCard');
         $playerId = self::getActivePlayerId();
         if (!in_array($place, $this->getLocations($playerId))) {
             throw new BgaUserException(self::_("You must select one of the Places you played this turn."));
@@ -1262,16 +1245,14 @@ class NotAlone extends Table
         $this->startHuntedLocationResolution($playerId, $place);
     }
 
-    function takeBackDiscardedPlace($place)
+    function actTakeBackDiscardedPlace(int $place)
     {
-        self::checkAction('takeBackDiscardedPlace');
         $this->activePlayerTakesBackDiscardedPlace($place);
         $this->gamestate->nextState("continue");
     }
 
-    function takeBackPlayedCard($place = null)
+    function actTakeBackPlayedCard(int $place)
     {
-        self::checkAction('takeBackPlayedCard');
         if ($this->gamestate->state()['name'] == 'doubleBack') {
             $playerId = self::getActivePlayerId();
             if (self::getUniqueValueFromDB("SELECT count(*) FROM hunted_place_card WHERE hunted_player_id = $playerId AND place_number = $place AND location IN ('REVEALED', 'RESOLVED')") != 1) {
@@ -1288,7 +1269,8 @@ class NotAlone extends Table
         }
     }
 
-    function playHuntCard($cardName)
+    #[CheckAction(false)]
+    function actPlayHuntCard(string $cardName)
     {
         if (self::getGameStateValue('sacrifice') == 1) {
             throw new BgaUserException(self::_('No Hunt cards can be played this turn because the Hunted played "Sacrifice".'));
@@ -1471,14 +1453,15 @@ class NotAlone extends Table
         }
         $state = $this->gamestate->state();
         if ($state['type'] == 'multipleactiveplayer'
-            && in_array('pass', $state['possibleactions'])
+            && in_array('actPass', $state['possibleactions'])
             && in_array($playerId, $this->gamestate->getActivePlayerList())
             && !$this->mightPlayACard($playerId)) {
-            $this->pass();
+            $this->actPass();
         }
     }
 
-    function playSurvivalCard($cardName)
+    #[CheckAction(false)]
+    function actPlaySurvivalCard(string $cardName)
     {
         if (self::getGameStateValue('despair') == 1) {
             throw new BgaUserException(self::_('No Survival cards can be played this turn because the Creature played "Despair".'));
@@ -1700,15 +1683,14 @@ class NotAlone extends Table
         $state = $this->gamestate->state();
         if ($state['type'] == 'multipleactiveplayer'
             && $state['name'] != "exploration"
-            && in_array('pass', $state['possibleactions'])
+            && in_array('actPass', $state['possibleactions'])
             && in_array($playerId, $this->gamestate->getActivePlayerList())) {
-            $this->pass();
+            $this->actPass();
         }
     }
 
-    function discardPlaceCard($place)
+    function actDiscardPlaceCard(int $place)
     {
-        self::checkAction('discardPlaceCard');
         $playerId = self::getCurrentPlayerId();
         if (self::getUniqueValueFromDB("SELECT location FROM hunted_place_card WHERE hunted_player_id = $playerId AND place_number = $place") != 'HAND') {
             throw new BgaVisibleSystemException("This card is not in your hand");
@@ -1727,9 +1709,8 @@ class NotAlone extends Table
         }
     }
 
-    function takeBack2PlaceCards($places)
+    function actTakeBack2PlaceCards(#[IntArrayParam()] array $places)
     {
-        $this->checkAction('takeBack2PlaceCards');
         if (sizeof($places) != 2) {
             throw new BgaVisibleSystemException("You must take back exactly 2 places cards.");
         }
@@ -1747,9 +1728,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("");
     }
 
-    function chooseHuntedPlayer($huntedPlayerId)
+    function actChooseHuntedPlayer(int $huntedPlayerId)
     {
-        self::checkAction('chooseHuntedPlayer');
         $playersInfos = self::loadPlayersBasicInfos();
         if (!array_key_exists($huntedPlayerId, $playersInfos) || $huntedPlayerId == self::getGameStateValue('creature_player')) {
             throw new BgaVisibleSystemException("You must choose a Hunted player.");
@@ -1784,9 +1764,8 @@ class NotAlone extends Table
         }
     }
 
-    function discardPlaceCards($places)
+    function actDiscardPlaceCards(#[IntArrayParam()] array $places)
     {
-        self::checkAction('discardPlaceCards');
         $playerId = self::getCurrentPlayerId();
         $state = $this->gamestate->state();
         switch ($state['name']) {
@@ -1832,9 +1811,8 @@ class NotAlone extends Table
         }
     }
 
-    function loseWill()
+    function actLoseWill()
     {
-        self::checkAction('loseWill');
         $playerId = self::getCurrentPlayerId();
         $notificationData = $this->prepareNotificationDataWithCard('hunt', 'scream');
         $notificationData['playerId'] = $playerId;
@@ -1847,9 +1825,8 @@ class NotAlone extends Table
         $this->gamestate->setPlayerNonMultiactive($playerId, "");
     }
 
-    function showPlaces($places)
+    function actShowPlaces(#[IntArrayParam()] array $places)
     {
-        self::checkAction('showPlaces');
         $playerId = self::getActivePlayerId();
         $cardsInHand = self::getUniqueValueFromDB("SELECT count(*) FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'");
         if ($cardsInHand - 2 != count($places)) {
@@ -1872,9 +1849,8 @@ class NotAlone extends Table
         $this->gamestate->nextState('hunting');
     }
 
-    function discardSurvivalCard($cardName)
+    function actDiscardSurvivalCard(string $cardName)
     {
-        self::checkAction('discardSurvivalCard');
         $cards = $this->survivalDeck->getCardsOfType($cardName);
         if (empty($cards)) {
             throw new BgaVisibleSystemException("Unexpected survival card: " . $cardName);
@@ -1893,9 +1869,8 @@ class NotAlone extends Table
         $this->gamestate->setPlayerNonMultiactive($playerId, "");
     }
 
-    function copyAdjacentPlace($place)
+    function actCopyAdjacentPlace(int $place)
     {
-        self::checkAction('copyAdjacentPlace');
         $resolvingPlace = self::getUniqueValueFromDB("SELECT place_number FROM hunted_place_card WHERE location = 'RESOLVING'");
         if (!$this->isAdjacentPlaces($resolvingPlace, $place)) {
             throw new BgaUserException(sprintf(self::_("This place is not adjacent to %s."), self::_($this->placeCards[$place]['name'])));
@@ -1912,9 +1887,8 @@ class NotAlone extends Table
         self::notifyAllPlayers("placeCopied", clienttranslate('${player_name} uses ${begin_card}${card_name}${end_card} to copy ${place_icon} ${place_name}.'), $notificationData);
     }
 
-    function moveHuntToken($tokenType, $place)
+    function actMoveHuntToken(string $tokenType,int $place)
     {
-        self::checkAction('moveHuntToken');
         $tokenLocation = self::getGameStateValue($tokenType . '_token');
         if (!in_array($place, $this->getPlacesAdjacentToToken($tokenLocation))) {
             throw new BgaUserException(self::_("This Place is not adjacent to the Hunt token."));
@@ -1952,9 +1926,8 @@ class NotAlone extends Table
         }
     }
 
-    function chooseIneffectivePlace($place)
+    function actChooseIneffectivePlace(int $place)
     {
-        self::checkAction('chooseIneffectivePlace');
         self::setGameStateValue('cataclysm', $place);
         $notificationData = $this->prepareNotificationDataWithCard('hunt', 'cataclysm');
         $notificationData['player_name'] = self::getActivePlayerName();
@@ -1965,9 +1938,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function moveHunted($huntedId, $origin, $destination)
+    function actMoveHunted(int $huntedId, int $origin, int $destination)
     {
-        self::checkAction('moveHunted');
         if (self::getUniqueValueFromDB("SELECT count(*) FROM hunted_place_card WHERE hunted_player_id = $huntedId AND place_number = $origin AND location IN ('REVEALED', 'RESOLVED')") != 1) {
             throw new BgaVisibleSystemException("This player did not reveal this place card.");
         } else if (!$this->isAdjacentPlaces($origin, $destination)) {
@@ -1990,9 +1962,8 @@ class NotAlone extends Table
         $this->gamestate->nextState("continue");
     }
 
-    function pass()
+    function actPass()
     {
-        self::checkAction('pass');
         $playerId = self::getCurrentPlayerId();
         switch ($this->gamestate->state()['phase']) {
             case 1:
@@ -2530,7 +2501,7 @@ class NotAlone extends Table
     {
         switch ($state['name']) {
             case 'boardSetup':
-                $this->chooseBoardSide(0);
+                $this->actChooseBoardSide(0);
                 break;
             case 'exploration':
                 if ($playerId == self::getGameStateValue('creature_player')) {
@@ -2539,47 +2510,47 @@ class NotAlone extends Table
                     $placePendingEffect = self::getUniqueValueFromDB("SELECT place_pending_effect FROM player WHERE player_id = $playerId");
                     $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
                     if (sizeof($places) == 0 || $placePendingEffect != null && sizeof($places) == 1) {
-                        $this->giveUp();
+                        $this->actGiveUp();
                         $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
                     }
                     if ($placePendingEffect == null) {
-                        $this->exploration(array($places[array_rand($places)]));
+                        $this->actExploration(array($places[array_rand($places)]));
                     } else {
-                        $this->exploration(array_rand(array_flip($places), 2));
+                        $this->actExploration(array_rand(array_flip($places), 2));
                     }
                 }
                 break;
             case 'artemiaTokenEffects':
             case 'forbiddenZone':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
-                $this->discardPlaceCard($places[array_rand($places)]);
+                $this->actDiscardPlaceCard($places[array_rand($places)]);
                 break;
             case 'sacrifice':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
                 if (sizeof($places) == 0) {
-                    $this->giveUp();
+                    $this->actGiveUp();
                     $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
                 }
-                $this->discardPlaceCard($places[array_rand($places)]);
+                $this->actDiscardPlaceCard($places[array_rand($places)]);
                 break;
             case 'sixthSense':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'DISCARD'", true);
-                $this->takeBack2PlaceCards(array_rand(array_flip($places), 2));
+                $this->actTakeBack2PlaceCards(array_rand(array_flip($places), 2));
                 break;
             case 'ascendancyDiscard':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
-                $this->discardPlaceCards(array_rand(array_flip($places), sizeof($places) - 2));
+                $this->actDiscardPlaceCards(array_rand(array_flip($places), sizeof($places) - 2));
                 break;
             case 'phobiaSelectPlacesToShow':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'HAND'", true);
-                $this->showPlaces(array_rand(array_flip($places), sizeof($places) - 2));
+                $this->actShowPlaces(array_rand(array_flip($places), sizeof($places) - 2));
                 break;
             case 'scream':
-                $this->loseWill();
+                $this->actLoseWill();
                 break;
             case 'toxin':
                 $cards = $this->survivalDeck->getCardsInLocation('hand', $playerId);
-                $this->discardSurvivalCard($cards[0]['type']);
+                $this->actDiscardSurvivalCard($cards[0]['type']);
                 break;
             case 'vortex':
                 $this->gamestate->nextState('');
@@ -2590,21 +2561,21 @@ class NotAlone extends Table
                 break;
             case 'gate':
                 $resolvingPlace = self::getUniqueValueFromDB("SELECT place_number FROM hunted_place_card WHERE location = 'RESOLVING'");
-                $this->copyAdjacentPlace($resolvingPlace < 6 ? $resolvingPlace + 5 : $resolvingPlace - 5);
+                $this->actCopyAdjacentPlace($resolvingPlace < 6 ? $resolvingPlace + 5 : $resolvingPlace - 5);
                 break;
             case 'theLair':
-                $this->takeBackDiscardedPlaceCards();
+                $this->actTakeBackDiscardedPlaceCards();
                 break;
             case 'theJungle':
             case 'Jungle_Swamp_Persecution':
-                $this->takeBackPlayedCard();
+                $this->actTakeBackPlayedCard();
                 break;
             case 'theSwamp':
-                $this->theSwamp([]);
+                $this->actTheSwamp([]);
                 break;
             case 'chooseRiverPlaceCard':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'PLAYED'", true);
-                $this->chooseRiverPlaceCard($places[array_rand($places)]);
+                $this->actChooseRiverPlaceCard($places[array_rand($places)]);
                 break;
             case 'chooseSurvivalCard':
                 $cards = $this->survivalDeck->getCardsInLocation('choice');
@@ -2612,7 +2583,7 @@ class NotAlone extends Table
                 break;
             case 'chooseArtefactPlaceCard':
                 $places = self::getObjectListFromDB("SELECT place_number FROM hunted_place_card WHERE hunted_player_id = $playerId AND location = 'REVEALED'", true);
-                $this->chooseArtefactPlaceCard($places[array_rand($places)]);
+                $this->actChooseArtefactPlaceCard($places[array_rand($places)]);
                 break;
             case 'phase2Cards':
             case 'reckoning':
@@ -2631,7 +2602,7 @@ class NotAlone extends Table
             case 'playSurvivalCardDrawn':
             case 'creaturePlayPhase3CardsInResponse':
             case 'huntedPlayPhase3CardsInResponse':
-                $this->pass();
+                $this->actPass();
                 break;
             default:
                 $this->gamestate->nextState("zombiePass");
