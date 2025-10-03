@@ -1,0 +1,27 @@
+{
+    "100": {
+        "name": "Game designer expert variant",
+        "values": [
+            {
+                "name": "Disabled"
+            },
+            {
+                "name": "Enabled"
+            }
+        ]
+    },
+    "101": {
+        "name": "Who will play the Creature?",
+        "values": [
+            {
+                "name": "A random player"
+            },
+            {
+                "name": "The table administrator"
+            },
+            {
+                "name": "NOT the table administrator"
+            }
+        ]
+    }
+}
