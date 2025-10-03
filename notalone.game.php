@@ -902,7 +902,7 @@ class NotAlone extends Table
         }
         $placeCardsQuantity = self::getUniqueValueFromDb("SELECT count(*) FROM hunted_place_card WHERE location = 'HAND' AND hunted_player_id = '$playerId'");
         $notificationData = array('playerId' => $playerId, 'player_name' => self::getCurrentPlayerName(), 'places' => $places,
-            'quantity' => 1, 'will_icon' => $this->getWillIcons());
+            'quantity' => 1, 'will_icon' => $this->getWillIcons(), 'total_place_cards' => $placeCardsQuantity);
         if (sizeof($places) == 2) {
             $notificationText = clienttranslate('${player_name} resists and loses ${will_icon}1 Will to take back ${place_icon_1} ${place_name_1} and ${place_icon_2} ${place_name_2} from its discard.');
             $notificationData['i18n'] = array('place_name_1', 'place_name_2');
@@ -910,7 +910,6 @@ class NotAlone extends Table
             $notificationData['place_icon_1'] = $this->getPlaceIcon($places[0]);
             $notificationData['place_name_2'] = $this->placeCards[$places[1]]['name'];
             $notificationData['place_icon_2'] = $this->getPlaceIcon($places[1]);
-            $notificationData['total_place_cards'] = $placeCardsQuantity;
         } else {
             $notificationText = clienttranslate('${player_name} resists and loses ${will_icon}1 Will to take back ${place_icon} ${place_name} from its discard.');
             $notificationData['i18n'] = array('place_name');
