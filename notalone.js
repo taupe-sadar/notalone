@@ -1238,6 +1238,7 @@ define([
 
         onStartHunting: function (event) {
             dojo.stopEvent(event);
+            dojo.destroy("board");
             this.bgaPerformAction('actChooseBoardSide', {side: this.gamedatas.boardSide});
         },
 
