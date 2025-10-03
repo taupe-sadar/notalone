@@ -1445,7 +1445,7 @@ define([
         },
 
         onPlaceToken: function (tokenType, position) {
-            this.bgaPerformAction('actPlaceToken',{tokenType: tokenType, position: position});
+            this.bgaPerformAction('actPlaceToken', {tokenType: tokenType, position: position}, {checkAction:false, checkPossibleActions: true});
         },
 
         onChooseHuntedPlayer: function (event) {
