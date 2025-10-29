@@ -95,12 +95,6 @@ class NotAlone extends Table
         $this->huntDeck->autoreshuffle_trigger = array('obj' => $this, 'method' => 'huntDeckShuffled');
     }
 
-    protected function getGameName()
-    {
-        // Used for translations and stuff. Please do not modify.
-        return "notalone";
-    }
-
     /*
         setupNewGame:
 
